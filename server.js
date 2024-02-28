@@ -6,6 +6,8 @@ const { checkVehicle } = require("./checkVehicle");
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.set("trust proxy", true);
+
 app.use(cors());
 
 const limiter = rateLimit({
