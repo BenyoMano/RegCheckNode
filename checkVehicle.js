@@ -13,6 +13,23 @@ async function checkVehicle(registrationNumber) {
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36"
     );
     await page.goto(url);
+
+    const specificCar = await page.evaluate(() => {
+      const vModelEl = document.querySelector("h1.card-title");
+      const vYearEl = document.querySelector("span#data-model-year");
+      const vPowerEl = [...document.querySelectorAll("span")].find((span) =>
+        span.textContent.includes("hk")
+      );
+      const vVolumeEl = [...document.querySelectorAll("span")].find((span) =>
+        span.textContent.includes("cm")
+      );
+      const vModel = vModelEl ? vModelEl.textContent.trim() : null;
+      const vYear = vYearEl ? vYearEl.textContent.trim() : null;
+      const vPower = vPowerEl ? vPowerEl.textContent.trim() : null;
+      const vVolume = vVolumeEl ? vVolumeEl.textContent.trim() : null;
+      return { vModel, vYear, vPower, vVolume };
+    });
+
     const isPoliceVehicle = await page.evaluate(() => {
       return [...document.querySelectorAll("div")].some((div) =>
         div.textContent.includes("FORDONET KAN TILLHÖRA POLISEN")
@@ -49,7 +66,7 @@ async function checkVehicle(registrationNumber) {
     }
 
     await browser.close();
-    return { isPoliceVehicle, name, tel };
+    return { specificCar, isPoliceVehicle, name, tel };
   } catch (error) {
     console.error("Error:", error);
     if (browser) {
